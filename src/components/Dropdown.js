@@ -1,7 +1,35 @@
-import React from 'react';
+import React, {useState, useEffect, useRef} from 'react';
+
+const hidden = {
+    display: 'none'
+}
+
+const visible = {
+    display: 'inherit'
+}
 
 
-const Dropdown = ({ options, selected, onSelectedChange }) => {
+const Dropdown = ({ label, options, selected, onSelectedChange }) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef();
+
+    useEffect(()=> {
+
+        const onBodyClick = (event) => {
+            if(ref.current.contains(event.target)){
+                return;
+            }
+            setOpen(false);
+            console.log('click!!');
+        };
+
+        window.addEventListener('click', onBodyClick, { capture: true });
+
+        return () => {
+            window.removeEventListener('click', onBodyClick);
+        };
+
+    }, []);
 
     const renderedOptions = options.map((option) => {
 
@@ -15,14 +43,16 @@ const Dropdown = ({ options, selected, onSelectedChange }) => {
                 {option.label}
             </div>
         );
-    })
+    });
 
     return (
-        <form action="">
-            <label htmlFor="">Select a Color</label>
-            <div className="item">{selected.label}</div>
-            <div className="menu">{renderedOptions}</div>
-        </form>
+        <div ref={ref} className="dropdown-container">
+            <form action="" onClick={() => setOpen(!open)}>
+                <label htmlFor="" >{label}</label>
+                <div className='item' >{selected.label}</div>
+                <div className="menu color-options" style={open ? visible : hidden}>{renderedOptions}</div>
+            </form>
+        </div>
     );
 };
 
